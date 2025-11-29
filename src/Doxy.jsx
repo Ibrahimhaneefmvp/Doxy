@@ -5,11 +5,11 @@ import {
   Heading1, Heading2, FileDown, Zap, Wand2, Printer, Palette,
   GraduationCap, BookOpen, Calculator, LayoutTemplate, ArrowRight,
   Cpu, Share2, ShieldCheck, Terminal, ChevronRight, Play, Star,
-  RotateCcw, Trash2
+  RotateCcw, Trash2, Moon, Sun
 } from 'lucide-react';
 
 // --- VISUAL FX COMPONENT (Interactive Neural Grid) ---
-const ParticleBackground = () => {
+const ParticleBackground = ({ theme = 'dark' }) => {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -100, y: -100 });
 
@@ -42,11 +42,16 @@ const ParticleBackground = () => {
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = -10;
-        this.size = Math.random() * 2 + 0.5;
+        this.size = Math.random() * 2 + 1; // Slightly larger
         this.speedX = Math.random() * 1 - 0.5;
         this.speedY = Math.random() * 0.5 + 0.2;
         this.life = Math.random() * 100 + 100;
-        this.color = Math.random() > 0.5 ? '#ccff00' : '#ffffff'; 
+        // Color based on theme
+        if (theme === 'sunset') {
+           this.color = Math.random() > 0.5 ? '#f472b6' : '#22d3ee'; // Pink/Cyan
+        } else {
+           this.color = Math.random() > 0.5 ? '#ccff00' : '#ffffff'; // Lime/White
+        }
       }
       
       update() {
@@ -58,34 +63,32 @@ const ParticleBackground = () => {
       
       draw() {
         ctx.fillStyle = this.color;
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.8; // Increased visibility
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    const particleCount = window.innerWidth < 768 ? 40 : 100;
+    const particleCount = window.innerWidth < 768 ? 50 : 120; // More particles
     for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw Particles
       particles.forEach(p => {
         p.update();
         p.draw();
 
-        // Interaction: Connect particles to mouse
         const dx = mouseRef.current.x - p.x;
         const dy = mouseRef.current.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 150) {
+        if (distance < 180) { // Longer connection range
           ctx.beginPath();
           ctx.strokeStyle = p.color;
-          ctx.lineWidth = 0.5;
-          ctx.globalAlpha = 1 - distance / 150;
+          ctx.lineWidth = 0.8; // Thicker lines
+          ctx.globalAlpha = 1 - distance / 180;
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
           ctx.stroke();
@@ -102,17 +105,31 @@ const ParticleBackground = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [theme]);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none opacity-40" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none opacity-60" />; // Increased container opacity
 };
 
 // --- LANDING PAGE COMPONENT ---
-const LandingPage = ({ onLaunch }) => {
+const LandingPage = ({ onLaunch, katexLoaded }) => {
+  const mathRef = useRef(null);
+
+  useEffect(() => {
+    if (katexLoaded && mathRef.current && window.katex) {
+      try {
+        window.katex.render("\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}", mathRef.current, {
+          throwOnError: false,
+          displayMode: true,
+          output: "html" // Use HTML output to avoid font loading issues if possible
+        });
+      } catch (e) { console.error(e); }
+    }
+  }, [katexLoaded]);
+
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-[#ccff00] selection:text-black overflow-x-hidden">
       
-      <ParticleBackground />
+      <ParticleBackground theme="dark" />
 
       {/* Nav */}
       <nav className="relative z-10 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto border-b border-white/5 backdrop-blur-sm sticky top-0">
@@ -180,8 +197,11 @@ const LandingPage = ({ onLaunch }) => {
                <div className="h-2 w-5/6 bg-white/5 rounded"></div>
                <div className="h-2 w-4/6 bg-white/5 rounded"></div>
                <div className="py-4">
-                 <div className="h-20 w-full bg-[#ccff00]/5 border border-[#ccff00]/20 rounded flex items-center justify-center text-[#ccff00] font-mono text-sm">
-                   {'$$ \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2} $$'}
+                 <div className="h-24 w-full bg-[#ccff00]/5 border border-[#ccff00]/20 rounded flex items-center justify-center text-[#ccff00] font-mono text-sm overflow-hidden p-4">
+                   <div ref={mathRef}>
+                     {/* Fallback if KaTeX isn't loaded yet */}
+                     {'$$ \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2} $$'}
+                   </div>
                  </div>
                </div>
                <div className="h-2 w-full bg-white/5 rounded"></div>
@@ -227,7 +247,7 @@ const Studio = ({ onHome, katexLoaded }) => {
   const [mode, setMode] = useState('instant');
   const [inputText, setInputText] = useState("");
   const [formattedHtml, setFormattedHtml] = useState("");
-  const [docTitle, setDocTitle] = useState("Untitled Document"); // New Title State
+  const [docTitle, setDocTitle] = useState("Untitled Document"); 
   const [apiKey, setApiKey] = useState("");
   const [showSettings, setShowSettings] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
@@ -236,6 +256,7 @@ const Studio = ({ onHome, katexLoaded }) => {
   const [activeTab, setActiveTab] = useState('editor');
   
   const [theme, setTheme] = useState('academic');
+  const [uiTheme, setUiTheme] = useState('dark'); // 'dark' (Default Void) or 'sunset' (Aesthetic)
   const [lastSaved, setLastSaved] = useState(null);
   const [stats, setStats] = useState({ words: 0, time: 0 });
   
@@ -249,7 +270,37 @@ const Studio = ({ onHome, katexLoaded }) => {
 
   const previewRef = useRef(null);
 
-  // --- Theme Config ---
+  // --- UI Theme Configs ---
+  const uiStyles = {
+    dark: {
+      bg: 'bg-[#050505]',
+      nav: 'bg-[#0a0a0a]',
+      sidebar: 'bg-[#080808]',
+      toolbar: 'bg-[#0a0a0a]',
+      editorBg: 'bg-[#111111]',
+      text: 'text-slate-200',
+      border: 'border-white/5',
+      accent: 'bg-[#ccff00] text-black',
+      secondary: 'text-slate-500',
+      selection: 'selection:bg-[#ccff00] selection:text-black'
+    },
+    sunset: {
+      bg: 'bg-[#1a0b2e]', // Deep purple
+      nav: 'bg-[#2d1b4e]', // Lighter purple
+      sidebar: 'bg-[#24123b]',
+      toolbar: 'bg-[#2d1b4e]',
+      editorBg: 'bg-[#130725]',
+      text: 'text-pink-100',
+      border: 'border-pink-500/20',
+      accent: 'bg-gradient-to-r from-pink-500 to-cyan-500 text-white',
+      secondary: 'text-pink-300/50',
+      selection: 'selection:bg-pink-500 selection:text-white'
+    }
+  };
+
+  const currentUi = uiStyles[uiTheme];
+
+  // --- Document Theme Config ---
   const themeStyles = {
     modern: {
       container: "font-sans text-slate-800",
@@ -277,18 +328,19 @@ const Studio = ({ onHome, katexLoaded }) => {
       if (parsed.docTitle) setDocTitle(parsed.docTitle);
       if (parsed.theme) setTheme(parsed.theme);
       if (parsed.apiKey) setApiKey(parsed.apiKey);
+      if (parsed.uiTheme) setUiTheme(parsed.uiTheme);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('Doxy_data', JSON.stringify({ inputText, docTitle, theme, apiKey }));
+    localStorage.setItem('Doxy_data', JSON.stringify({ inputText, docTitle, theme, apiKey, uiTheme }));
     setLastSaved(new Date());
     
     if (inputText) {
       const words = inputText.trim().split(/\s+/).length;
       setStats({ words: words, time: Math.ceil(words / 200) });
     }
-  }, [inputText, docTitle, theme, apiKey]);
+  }, [inputText, docTitle, theme, apiKey, uiTheme]);
 
   // --- Formatting Logic ---
   const processText = (text) => {
@@ -493,11 +545,11 @@ const Studio = ({ onHome, katexLoaded }) => {
   };
 
   const EditorButton = ({ icon: Icon, title, onClick }) => (
-    <button onClick={onClick} title={title} className="p-2 rounded hover:bg-slate-100/10 text-slate-300 hover:text-[#ccff00] transition-colors shrink-0" type="button"><Icon size={18} /></button>
+    <button onClick={onClick} title={title} className={`p-2 rounded hover:bg-white/10 ${currentUi.secondary} hover:text-white transition-colors shrink-0`} type="button"><Icon size={18} /></button>
   );
 
   return (
-    <div className="flex flex-col h-screen bg-[#050505] font-sans text-slate-200">
+    <div className={`flex flex-col h-screen ${currentUi.bg} font-sans ${currentUi.text} ${currentUi.selection} transition-colors duration-500`}>
       <style>{`
         @media print {
           @page { margin: 2cm; size: auto; }
@@ -508,86 +560,95 @@ const Studio = ({ onHome, katexLoaded }) => {
       `}</style>
 
       {/* Top Bar */}
-      <nav className="h-14 bg-[#0a0a0a] border-b border-white/5 flex items-center justify-between px-4 z-20 shadow-sm shrink-0">
+      <nav className={`h-14 ${currentUi.nav} ${currentUi.border} border-b flex items-center justify-between px-4 z-20 shadow-sm shrink-0 transition-colors duration-500`}>
         <div className="flex items-center gap-4">
           <button onClick={onHome} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <div className={`p-1.5 rounded-lg shadow-sm transition-colors ${mode === 'magic' ? 'bg-indigo-600' : 'bg-[#ccff00]'}`}>
-              {mode === 'magic' ? <Sparkles className="text-white" size={20} /> : <FileText className="text-black" size={20} />}
+            <div className={`p-1.5 rounded-lg shadow-sm transition-colors ${mode === 'magic' ? 'bg-indigo-600 text-white' : currentUi.accent}`}>
+              {mode === 'magic' ? <Sparkles size={20} /> : <FileText size={20} />}
             </div>
-            <span className="font-bold text-lg tracking-tight text-white hidden sm:inline">Doxy</span>
+            <span className="font-bold text-lg tracking-tight hidden sm:inline">Doxy</span>
           </button>
           
-          {/* File Name Input (Moved from Document) */}
+          {/* File Name Input */}
           <div className="hidden md:flex items-center">
-             <span className="text-slate-600 mx-2">/</span>
+             <span className={`${currentUi.secondary} mx-2`}>/</span>
              <input 
                value={docTitle} 
                onChange={(e) => setDocTitle(e.target.value)} 
-               className="bg-transparent text-slate-300 font-medium focus:text-[#ccff00] outline-none w-48 truncate placeholder-slate-600"
+               className={`bg-transparent font-medium outline-none w-48 truncate ${currentUi.text} opacity-90 focus:opacity-100`}
                placeholder="Untitled Document"
              />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-white/5 rounded-lg p-0.5 border border-white/5 print-hide">
+          {/* UI Theme Toggle */}
+          <button 
+            onClick={() => setUiTheme(prev => prev === 'dark' ? 'sunset' : 'dark')}
+            className={`p-2 rounded-full ${currentUi.border} border hover:bg-white/10 transition-all text-white`}
+            title="Toggle Cockpit Theme"
+          >
+            {uiTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+
+          <div className={`flex items-center ${currentUi.border} border bg-white/5 rounded-lg p-0.5 print-hide`}>
             {['modern', 'academic', 'creative'].map((t) => (
-              <button key={t} onClick={() => setTheme(t)} className={`px-3 py-1 text-xs font-medium rounded-md transition-all capitalize ${theme === t ? 'bg-[#ccff00] text-black shadow-sm' : 'text-slate-400 hover:text-white'}`}>{t}</button>
+              <button key={t} onClick={() => setTheme(t)} className={`px-3 py-1 text-xs font-medium rounded-md transition-all capitalize ${theme === t ? `${currentUi.accent} shadow-sm` : `${currentUi.secondary} hover:text-white`}`}>{t}</button>
             ))}
           </div>
-          {lastSaved && <span className="text-xs text-slate-500 hidden md:flex items-center gap-1"><Check size={12}/> Saved</span>}
-           <button onClick={() => setShowSettings(true)} className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${!apiKey ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'text-slate-400 border-transparent hover:bg-white/5'}`}><Settings size={16} />{!apiKey && <span className="hidden sm:inline">Set API Key</span>}</button>
+          {lastSaved && <span className={`text-xs ${currentUi.secondary} hidden md:flex items-center gap-1`}><Check size={12}/> Saved</span>}
+           <button onClick={() => setShowSettings(true)} className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${!apiKey ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : `${currentUi.secondary} border-transparent hover:bg-white/5`}`}><Settings size={16} />{!apiKey && <span className="hidden sm:inline">Set API Key</span>}</button>
         </div>
       </nav>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden main-content">
-        {/* Sidebar - Dark Mode */}
-        <div className={`sidebar w-full md:w-1/3 border-r border-white/5 flex flex-col bg-[#080808] ${activeTab === 'editor' ? 'block' : 'hidden md:flex'}`}>
-          <div className="p-3 border-b border-white/5 grid grid-cols-2 gap-1">
-            <button onClick={() => setMode('instant')} className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${mode === 'instant' ? 'bg-[#ccff00] text-black shadow-sm' : 'text-slate-500 hover:bg-white/5'}`}><Zap size={16} /> Instant</button>
-            <button onClick={() => setMode('magic')} className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${mode === 'magic' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:bg-white/5'}`}><Wand2 size={16} /> AI Magic</button>
+        {/* Sidebar */}
+        <div className={`sidebar w-full md:w-1/3 border-r ${currentUi.border} flex flex-col ${currentUi.sidebar} ${activeTab === 'editor' ? 'block' : 'hidden md:flex'} transition-colors duration-500`}>
+          <div className={`p-3 border-b ${currentUi.border} grid grid-cols-2 gap-1`}>
+            <button onClick={() => setMode('instant')} className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${mode === 'instant' ? `${currentUi.accent} shadow-sm` : `${currentUi.secondary} hover:bg-white/5`}`}><Zap size={16} /> Instant</button>
+            <button onClick={() => setMode('magic')} className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${mode === 'magic' ? 'bg-indigo-600 text-white shadow-sm' : `${currentUi.secondary} hover:bg-white/5`}`}><Wand2 size={16} /> AI Magic</button>
           </div>
           <div className="flex-1 relative group">
-            <textarea className="absolute inset-0 w-full h-full p-6 resize-none focus:outline-none font-mono text-sm text-slate-300 bg-[#080808] leading-6 selection:bg-[#ccff00] selection:text-black" placeholder={mode === 'instant' ? "# Paste Markdown here...\n\nSupports LaTeX Math ($$x=y$$)." : "Paste unstructured text here..."} value={inputText} onChange={(e) => setInputText(e.target.value)} />
+            <textarea className={`absolute inset-0 w-full h-full p-6 resize-none focus:outline-none font-mono text-sm ${currentUi.text} bg-transparent leading-6 ${currentUi.selection}`} placeholder={mode === 'instant' ? "# Paste Markdown here...\n\nSupports LaTeX Math ($$x=y$$)." : "Paste unstructured text here..."} value={inputText} onChange={(e) => setInputText(e.target.value)} />
             {inputText && <button onClick={() => setInputText('')} className="absolute top-2 right-2 p-1.5 bg-white/10 text-slate-400 rounded hover:bg-red-500/20 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><Eraser size={14} /></button>}
           </div>
-          <div className="p-4 border-t border-white/5 bg-[#0a0a0a]">
-             {mode === 'instant' ? <div className="text-center text-xs text-slate-500 font-medium py-2"><span className="flex items-center justify-center gap-1"><Zap size={12}/> Auto-converting</span></div> : <button onClick={handleAIMagic} disabled={isProcessing || !inputText} className={`w-full py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md ${isProcessing ? 'bg-white/5 text-slate-500' : 'bg-indigo-600 text-white hover:bg-indigo-500'}`}>{isProcessing ? "Formatting..." : <><Sparkles size={16} /> Format with AI</>}</button>}
+          <div className={`p-4 border-t ${currentUi.border}`}>
+             {mode === 'instant' ? <div className={`text-center text-xs ${currentUi.secondary} font-medium py-2`}><span className="flex items-center justify-center gap-1"><Zap size={12}/> Auto-converting</span></div> : <button onClick={handleAIMagic} disabled={isProcessing || !inputText} className={`w-full py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md ${isProcessing ? 'bg-white/5 text-slate-500' : 'bg-indigo-600 text-white hover:bg-indigo-500'}`}>{isProcessing ? "Formatting..." : <><Sparkles size={16} /> Format with AI</>}</button>}
           </div>
         </div>
 
-        {/* Studio Editor - High Contrast */}
-        <div className={`flex-1 flex flex-col bg-[#0e0e0e] ${activeTab === 'preview' ? 'block' : 'hidden md:flex'}`}>
-          <div className="toolbar h-12 bg-[#0a0a0a] border-b border-white/5 flex items-center px-4 justify-between shadow-sm z-10">
-            <div className="flex items-center gap-1 pr-4 border-r border-white/10 overflow-x-auto no-scrollbar">
+        {/* Studio Editor */}
+        <div className={`flex-1 flex flex-col ${currentUi.editorBg} ${activeTab === 'preview' ? 'block' : 'hidden md:flex'} transition-colors duration-500`}>
+          <div className={`toolbar h-12 ${currentUi.toolbar} border-b ${currentUi.border} flex items-center px-4 justify-between shadow-sm z-10 transition-colors duration-500`}>
+            <div className={`flex items-center gap-1 pr-4 border-r ${currentUi.border} overflow-x-auto no-scrollbar`}>
                <EditorButton icon={Bold} title="Bold" onClick={() => execCmd('bold')} />
                <EditorButton icon={Italic} title="Italic" onClick={() => execCmd('italic')} />
                <EditorButton icon={Underline} title="Underline" onClick={() => execCmd('underline')} />
-               <div className="w-px h-4 bg-white/10 mx-2 hidden sm:block"></div>
+               <div className={`w-px h-4 bg-white/10 mx-2 hidden sm:block`}></div>
                <EditorButton icon={Heading1} title="H1" onClick={() => execCmd('formatBlock', 'H1')} />
                <EditorButton icon={Heading2} title="H2" onClick={() => execCmd('formatBlock', 'H2')} />
                <EditorButton icon={List} title="Bullet List" onClick={() => execCmd('insertUnorderedList')} />
-               <div className="w-px h-4 bg-white/10 mx-2 hidden sm:block"></div>
+               <div className={`w-px h-4 bg-white/10 mx-2 hidden sm:block`}></div>
                <EditorButton icon={GraduationCap} title="Add Cover Page" onClick={() => setShowCoverModal(true)} />
                <EditorButton icon={BookOpen} title="Auto-Generate Bibliography" onClick={generateBibliography} />
-               <div className="w-px h-4 bg-white/10 mx-2 hidden sm:block"></div>
+               <div className={`w-px h-4 bg-white/10 mx-2 hidden sm:block`}></div>
                <button onClick={handleReset} title="Reset Document" className="p-2 rounded hover:bg-red-500/10 text-slate-500 hover:text-red-500 transition-colors shrink-0"><Trash2 size={18} /></button>
             </div>
             <div className="flex items-center gap-2 pl-2 shrink-0">
-               <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-white/5 hover:bg-white/10 rounded-md transition-colors"><Printer size={14} /> PDF</button>
+               <button onClick={handlePrint} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium ${currentUi.secondary} bg-white/5 hover:bg-white/10 rounded-md transition-colors`}><Printer size={14} /> PDF</button>
                <button onClick={() => handleDownload('doc')} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-md transition-colors"><FileDown size={14} /> .Doc</button>
-               <button onClick={handleCopyRichText} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-black bg-[#ccff00] hover:bg-[#b3e600] rounded-md transition-colors shadow-sm"><Copy size={14} /></button>
+               <button onClick={handleCopyRichText} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors shadow-sm ${currentUi.accent}`}><Copy size={14} /></button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 md:p-12 cursor-text relative bg-[#111111]" onClick={() => previewRef.current?.focus()}>
+          <div className="flex-1 overflow-y-auto p-6 md:p-12 cursor-text relative" onClick={() => previewRef.current?.focus()}>
             {/* The Actual Page - Stays White for Contrast */}
             <div className={`document-page max-w-3xl mx-auto bg-white shadow-2xl rounded-sm min-h-[800px] p-12 relative group animate-in fade-in zoom-in-95 duration-300 ${themeStyles[theme].container}`}>
               {inputText ? <div ref={previewRef} contentEditable suppressContentEditableWarning className="outline-none text-lg leading-relaxed min-h-[500px]" dangerouslySetInnerHTML={{ __html: formattedHtml }} /> : <div ref={previewRef} contentEditable suppressContentEditableWarning className="outline-none text-lg leading-relaxed min-h-[500px] empty:before:content-['Type_here...'] empty:before:text-slate-300" />}
             </div>
             
-            <div className="stats-footer sticky bottom-4 left-0 right-0 mx-auto w-fit bg-slate-800 text-white px-4 py-1.5 rounded-full text-xs shadow-lg flex gap-4 opacity-90 hover:opacity-100 transition-opacity z-20">
+            <div className={`stats-footer sticky bottom-4 left-0 right-0 mx-auto w-fit ${currentUi.nav} ${currentUi.text} ${currentUi.border} border px-4 py-1.5 rounded-full text-xs shadow-lg flex gap-4 opacity-90 hover:opacity-100 transition-opacity z-20`}>
               <span className="flex items-center gap-1.5"><LayoutTemplate size={12}/> {stats.words} words</span>
               <span className="opacity-50">|</span>
               <span className="flex items-center gap-1.5"><Calculator size={12}/> ~{stats.time} min read</span>
@@ -596,27 +657,32 @@ const Studio = ({ onHome, katexLoaded }) => {
         </div>
       </div>
 
+      <div className={`md:hidden mobile-tabs h-14 ${currentUi.nav} border-t ${currentUi.border} flex shrink-0`}>
+        <button onClick={() => setActiveTab('editor')} className={`flex-1 font-medium text-sm flex items-center justify-center gap-2 ${activeTab === 'editor' ? 'text-indigo-400' : 'text-slate-500'}`}><Type size={16} /> Input</button>
+        <button onClick={() => setActiveTab('preview')} className={`flex-1 font-medium text-sm flex items-center justify-center gap-2 ${activeTab === 'preview' ? 'text-indigo-400' : 'text-slate-500'}`}><FileText size={16} /> Document</button>
+      </div>
+
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-[#111] border border-white/10 rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95">
-            <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold text-white">Settings</h2><button onClick={() => setShowSettings(false)} className="text-slate-500 hover:text-white"><X size={20}/></button></div>
-            <div className="mb-6"><label className="block text-sm font-medium text-slate-400 mb-2">Gemini API Key</label><input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg focus:ring-1 focus:ring-[#ccff00] outline-none text-white" placeholder="AIza..." /><p className="text-xs text-slate-500 mt-2">Required for Magic Mode. Instant mode is free.</p></div>
-            <div className="flex justify-end"><button onClick={() => setShowSettings(false)} className="px-4 py-2 bg-[#ccff00] text-black font-bold rounded-lg hover:bg-[#b3e600]">Done</button></div>
+          <div className={`${currentUi.nav} ${currentUi.border} border rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95`}>
+            <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">Settings</h2><button onClick={() => setShowSettings(false)} className="text-slate-500 hover:text-white"><X size={20}/></button></div>
+            <div className="mb-6"><label className="block text-sm font-medium text-slate-400 mb-2">Gemini API Key</label><input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="AIza..." /><p className="text-xs text-slate-500 mt-2">Required for Magic Mode. Instant mode is free.</p></div>
+            <div className="flex justify-end"><button onClick={() => setShowSettings(false)} className={`px-4 py-2 ${currentUi.accent} font-bold rounded-lg`}>Done</button></div>
           </div>
         </div>
       )}
 
       {showCoverModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-[#111] border border-white/10 rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95">
-            <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold text-white">Cover Page</h2><button onClick={() => setShowCoverModal(false)} className="text-slate-500 hover:text-white"><X size={20}/></button></div>
+          <div className={`${currentUi.nav} ${currentUi.border} border rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95`}>
+            <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">Cover Page</h2><button onClick={() => setShowCoverModal(false)} className="text-slate-500 hover:text-white"><X size={20}/></button></div>
             <div className="space-y-3 mb-6">
-               <input className="w-full px-3 py-2 bg-black border border-white/10 rounded text-white focus:border-[#ccff00] outline-none" placeholder="University Name" value={coverData.uni} onChange={e => setCoverData({...coverData, uni: e.target.value})} />
-               <input className="w-full px-3 py-2 bg-black border border-white/10 rounded text-white focus:border-[#ccff00] outline-none" placeholder="Course Title" value={coverData.course} onChange={e => setCoverData({...coverData, course: e.target.value})} />
-               <input className="w-full px-3 py-2 bg-black border border-white/10 rounded text-white focus:border-[#ccff00] outline-none" placeholder="Assignment Title" value={coverData.title} onChange={e => setCoverData({...coverData, title: e.target.value})} />
-               <input className="w-full px-3 py-2 bg-black border border-white/10 rounded text-white focus:border-[#ccff00] outline-none" placeholder="Student Name" value={coverData.student} onChange={e => setCoverData({...coverData, student: e.target.value})} />
+               <input className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded outline-none" placeholder="University Name" value={coverData.uni} onChange={e => setCoverData({...coverData, uni: e.target.value})} />
+               <input className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded outline-none" placeholder="Course Title" value={coverData.course} onChange={e => setCoverData({...coverData, course: e.target.value})} />
+               <input className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded outline-none" placeholder="Assignment Title" value={coverData.title} onChange={e => setCoverData({...coverData, title: e.target.value})} />
+               <input className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded outline-none" placeholder="Student Name" value={coverData.student} onChange={e => setCoverData({...coverData, student: e.target.value})} />
             </div>
-            <div className="flex justify-end"><button onClick={insertCoverPage} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Insert</button></div>
+            <div className="flex justify-end"><button onClick={insertCoverPage} className={`px-4 py-2 ${currentUi.accent} font-bold rounded-lg`}>Insert</button></div>
           </div>
         </div>
       )}
@@ -653,7 +719,7 @@ const Doxy = () => {
   }, []);
 
   return view === 'landing' 
-    ? <LandingPage onLaunch={() => setView('app')} /> 
+    ? <LandingPage onLaunch={() => setView('app')} katexLoaded={katexLoaded} /> 
     : <Studio onHome={() => setView('landing')} katexLoaded={katexLoaded} />;
 };
 
