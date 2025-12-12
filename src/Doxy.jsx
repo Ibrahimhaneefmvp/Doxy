@@ -155,7 +155,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]"></span>
             </span>
-            BUILT BY A STUDENT, FOR STUDENTS
+            WE'RE NOT LAZY, WE'RE PRITORITIZING EFFORTS
           </div>
           
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -234,7 +234,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
       </section>
 
       <footer className="py-12 text-center text-slate-600 text-sm relative z-10 bg-black border-t border-white/5">
-        <p>Made with ☕ by a Student.</p>
+        <p>With ❤️, Team Swiftly⚡.</p>
       </footer>
     </div>
   );
