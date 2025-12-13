@@ -8,6 +8,34 @@ import {
   RotateCcw, Trash2, Moon, Sun, Undo, Redo, RemoveFormatting, Link as LinkIcon, Quote
 } from 'lucide-react';
 
+// --- PROMPT ENGINE ---
+const getSystemPrompt = (theme, text) => {
+  const baseRules = `
+    You are an expert document formatter named Doxy. Your goal is to transform raw text into a distinction-grade document.
+    
+    STRICT RULES:
+    1.  **Output ONLY the Markdown:** Do not include conversational filler like "Here is your document" or "I have formatted this". Start directly with the content.
+    2.  **Structure:** Use proper Markdown headers (#, ##, ###). Do NOT use bold text (**Header**) for sections; convert them to real headers.
+    3.  **Math:** Detect ALL mathematical expressions (formulas, variables) and convert them to LaTeX syntax. 
+        - Block math: $$ ... $$
+        - Inline math: $ ... $
+    4.  **Tables:** If the text contains structured data (lists of stats, comparisons), format it as a Markdown Table.
+    5.  **Citations:** Keep links intact.
+  `;
+
+  const styles = {
+    modern: "STYLE: Modern Business. Use active voice, bullet points for readability, and concise paragraphs. Professional but punchy.",
+    academic: "STYLE: University Academic. Use formal, objective tone. Prefer passive voice where appropriate. Use long, cohesive paragraphs. Ensure high lexical density.",
+    creative: "STYLE: Creative Narrative. Focus on flow, engagement, and varied sentence structure. Use blockquotes for emphasis."
+  };
+
+  return `${baseRules}
+  ${styles[theme] || styles.academic}
+  
+  RAW INPUT TEXT:
+  ${text}`;
+};
+
 // --- VISUAL FX COMPONENT ---
 const ParticleBackground = ({ theme = 'dark' }) => {
   const canvasRef = useRef(null);
@@ -137,7 +165,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]"></span>
             </span>
-            We're not getting lazy, we're just becoming efficient.
+            BUILT BY A STUDENT, FOR STUDENTS
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             STOP FORMATTING. <br />
@@ -193,7 +221,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
       </section>
 
       <footer className="py-12 text-center text-slate-600 text-sm relative z-10 bg-black border-t border-white/5">
-        <p>With ❤️, Team Swiftly⚡.</p>
+        <p>Made with ☕ by a Student.</p>
       </footer>
     </div>
   );
@@ -436,7 +464,7 @@ const Studio = ({ onHome, katexLoaded }) => {
     if (!apiKey) { setShowSettings(true); return; }
     setIsProcessing(true);
     try {
-      const prompt = `Format text to academic ${theme} style. Use LaTeX for math ($$). Text:\n${inputText}`;
+      const prompt = getSystemPrompt(theme, inputText); // Using the new Engine
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
