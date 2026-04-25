@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import html2pdf from 'html2pdf.js';
-import { 
+import {
   FileText, Copy, Settings, Eraser, Check, Type, Sparkles, AlertCircle, X,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List,
   Heading1, Heading2, FileDown, Zap, Wand2, Printer, Palette,
   GraduationCap, BookOpen, Calculator, LayoutTemplate, ArrowRight,
   Cpu, Share2, ShieldCheck, Terminal, ChevronRight, Play, Star,
-  RotateCcw, Trash2, Moon, Sun, Undo, Redo, RemoveFormatting, Link as LinkIcon, Quote
+  RotateCcw, Trash2, Moon, Sun, Undo, Redo, RemoveFormatting, Link as LinkIcon, Quote, ListOrdered
 } from 'lucide-react';
 
 // --- PROMPT ENGINE ---
@@ -48,16 +48,16 @@ const ParticleBackground = ({ theme = 'dark' }) => {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let particles = [];
-    
+
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-    
+
     const handleMouseMove = (e) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
-    
+
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', handleMouseMove);
     resize();
@@ -67,7 +67,7 @@ const ParticleBackground = ({ theme = 'dark' }) => {
         this.reset();
         this.y = Math.random() * canvas.height;
       }
-      
+
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = -10;
@@ -76,18 +76,18 @@ const ParticleBackground = ({ theme = 'dark' }) => {
         this.speedY = Math.random() * 0.5 + 0.2;
         this.life = Math.random() * 100 + 100;
         if (theme === 'sunset') {
-           this.color = Math.random() > 0.5 ? '#f472b6' : '#22d3ee';
+          this.color = Math.random() > 0.5 ? '#f472b6' : '#22d3ee';
         } else {
-           this.color = Math.random() > 0.5 ? '#ccff00' : '#ffffff';
+          this.color = Math.random() > 0.5 ? '#ccff00' : '#ffffff';
         }
       }
-      
+
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
         if (this.y > canvas.height) this.reset();
       }
-      
+
       draw() {
         ctx.fillStyle = this.color;
         ctx.globalAlpha = 0.8;
@@ -156,7 +156,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
           <span className="font-bold text-xl tracking-tight text-white">Doxy</span>
         </div>
         <div className="flex items-center gap-6">
-           <button onClick={onLaunch} className="text-sm font-bold bg-white/10 hover:bg-white/20 px-5 py-2 rounded-full transition-all text-white border border-white/10 hover:border-[#ccff00]/50">Launch Studio</button>
+          <button onClick={onLaunch} className="text-sm font-bold bg-white/10 hover:bg-white/20 px-5 py-2 rounded-full transition-all text-white border border-white/10 hover:border-[#ccff00]/50">Launch Studio</button>
         </div>
       </nav>
       <header className="relative z-10 px-6 pt-24 pb-32 max-w-7xl mx-auto text-center md:text-left grid md:grid-cols-2 gap-12 items-center">
@@ -166,7 +166,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]"></span>
             </span>
-            BUILT BY A STUDENT, FOR STUDENTS
+            Because the midnight will strike without warning and the deadline will never wait.
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             STOP FORMATTING. <br />
@@ -186,14 +186,14 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
           <div className="relative bg-[#0f0f0f] border border-white/10 rounded-xl p-8 backdrop-blur-md rotate-2 hover:rotate-0 transition-transform duration-500 shadow-2xl">
             <div className="h-4 w-32 bg-white/10 rounded mb-8"></div>
             <div className="space-y-4">
-               <div className="h-2 w-full bg-white/5 rounded"></div>
-               <div className="h-2 w-5/6 bg-white/5 rounded"></div>
-               <div className="py-4">
-                 <div className="h-24 w-full bg-[#ccff00]/5 border border-[#ccff00]/20 rounded flex items-center justify-center text-[#ccff00] font-mono text-sm overflow-hidden p-4">
-                   <div ref={mathRef}>{'$$ \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2} $$'}</div>
-                 </div>
-               </div>
-               <div className="h-2 w-full bg-white/5 rounded"></div>
+              <div className="h-2 w-full bg-white/5 rounded"></div>
+              <div className="h-2 w-5/6 bg-white/5 rounded"></div>
+              <div className="py-4">
+                <div className="h-24 w-full bg-[#ccff00]/5 border border-[#ccff00]/20 rounded flex items-center justify-center text-[#ccff00] font-mono text-sm overflow-hidden p-4">
+                  <div ref={mathRef}>{'$$ \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2} $$'}</div>
+                </div>
+              </div>
+              <div className="h-2 w-full bg-white/5 rounded"></div>
             </div>
           </div>
         </div>
@@ -222,7 +222,7 @@ const LandingPage = ({ onLaunch, katexLoaded }) => {
       </section>
 
       <footer className="py-12 text-center text-slate-600 text-sm relative z-10 bg-black border-t border-white/5">
-        <p>Made with ☕ by a Student.</p>
+        <p>Made with <span role="img" aria-label="coffee">☕</span> and <span role="img" aria-label="heart">❤️</span> by a Student.</p>
       </footer>
     </div>
   );
@@ -427,15 +427,55 @@ const Studio = ({ onHome, katexLoaded }) => {
     }
   };
 
+  const generateTOC = () => {
+    if (!previewRef.current) return;
+    
+    // Make it modular: Remove existing TOC if present so it doesn't duplicate
+    const existingTOC = previewRef.current.querySelector('.toc-container');
+    if (existingTOC) existingTOC.remove();
+
+    const headers = Array.from(previewRef.current.querySelectorAll('h1, h2, h3'));
+    if (headers.length === 0) {
+      setNotification({ msg: "No headers found for TOC.", type: 'error' });
+      return;
+    }
+
+    let tocHTML = `<div class="toc-container my-8 p-8 bg-slate-50 border border-slate-200 rounded-lg shadow-sm" contenteditable="false">
+      <h2 class="text-2xl font-bold mb-6 border-b border-slate-200 pb-2 text-slate-800">Table of Contents</h2>
+      <ul class="list-none space-y-3 m-0 p-0 text-slate-700">`;
+      
+    headers.forEach((h, i) => {
+      // Assign an ID so the TOC links work
+      if (!h.id) h.id = `header-${i}`;
+      const level = parseInt(h.tagName[1]) - 1; // H1 -> 0, H2 -> 1, H3 -> 2
+      const indent = level * 1.5; // rem indent
+      tocHTML += `<li style="margin-left: ${indent}rem;" class="opacity-80 hover:opacity-100 hover:text-indigo-600 transition-colors">
+        <a href="#${h.id}" class="no-underline cursor-pointer">${h.innerText}</a>
+      </li>`;
+    });
+    
+    tocHTML += `</ul></div>`;
+
+    // Insert after Cover Page, or at the top
+    const coverPage = previewRef.current.querySelector('.cover-page');
+    if (coverPage) {
+      coverPage.insertAdjacentHTML('afterend', tocHTML);
+    } else {
+      previewRef.current.insertAdjacentHTML('afterbegin', tocHTML);
+    }
+    
+    setNotification({ msg: "Table of Contents Generated!", type: 'success' });
+  };
+
   const generateBibliography = () => {
     if (!previewRef.current) return;
     const links = previewRef.current.querySelectorAll('a.citation-link');
-    if (links.length === 0) { setNotification({msg:"No citations found.", type:'error'}); return; }
+    if (links.length === 0) { setNotification({ msg: "No citations found.", type: 'error' }); return; }
     let html = `<div class="bibliography mt-16 pt-8 border-t border-slate-200 page-break-before"><h2 class="text-2xl font-bold mb-6">References</h2><ul class="list-none space-y-4">`;
-    links.forEach((l, i) => html += `<li class="pl-8 -indent-8 text-slate-700">[${i+1}] ${l.innerText}. Available at: <span class="italic underline text-blue-600">${l.href}</span> (Accessed: ${new Date().toLocaleDateString()}).</li>`);
+    links.forEach((l, i) => html += `<li class="pl-8 -indent-8 text-slate-700">[${i + 1}] ${l.innerText}. Available at: <span class="italic underline text-blue-600">${l.href}</span> (Accessed: ${new Date().toLocaleDateString()}).</li>`);
     html += `</ul></div>`;
     previewRef.current.innerHTML += html;
-    setNotification({msg:"Bibliography Generated!", type:'success'});
+    setNotification({ msg: "Bibliography Generated!", type: 'success' });
   };
 
   const handleReset = () => {
@@ -450,21 +490,21 @@ const Studio = ({ onHome, katexLoaded }) => {
     // Add a temporary print class to prevent UI elements from being captured if any,
     // though html2pdf mainly captures what's inside the ref.
     const element = previewRef.current.parentElement; // The document-page div
-    
+
     const opt = {
-      margin:       0.5,
-      filename:     `${docTitle.replace(/\s+/g, '_')}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      margin: 0.5,
+      filename: `${docTitle.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    
+
     html2pdf().set(opt).from(element).save().then(() => {
       setIsProcessing(false);
-      setNotification({msg:"PDF Downloaded Successfully!", type:'success'});
+      setNotification({ msg: "PDF Downloaded Successfully!", type: 'success' });
     }).catch(e => {
       setIsProcessing(false);
-      setNotification({msg:"Failed to generate PDF.", type:'error'});
+      setNotification({ msg: "Failed to generate PDF.", type: 'error' });
       console.error(e);
     });
   };
@@ -480,17 +520,17 @@ const Studio = ({ onHome, katexLoaded }) => {
       const data = await res.json();
       if (data.error) throw new Error(data.error.message);
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) { setInputText(text); setNotification({msg:"Magic Applied!", type:'success'}); }
-    } catch (e) { setNotification({msg: e.message, type:'error'}); } finally { setIsProcessing(false); }
+      if (text) { setInputText(text); setNotification({ msg: "Magic Applied!", type: 'success' }); }
+    } catch (e) { setNotification({ msg: e.message, type: 'error' }); } finally { setIsProcessing(false); }
   };
 
   // --- Toolbar Component ---
   const EditorBtn = ({ icon: Icon, title, onClick, active, disabled }) => (
-    <button 
+    <button
       onMouseDown={(e) => { e.preventDefault(); onClick(); }} // Prevent focus loss on click
-      title={title} 
+      title={title}
       disabled={disabled}
-      className={`p-2 rounded transition-colors shrink-0 ${disabled ? 'opacity-30 cursor-not-allowed' : ''} ${active ? currentUi.activeBtn : currentUi.secondary} ${!active && !disabled ? currentUi.hover : ''}`} 
+      className={`p-2 rounded transition-colors shrink-0 ${disabled ? 'opacity-30 cursor-not-allowed' : ''} ${active ? currentUi.activeBtn : currentUi.secondary} ${!active && !disabled ? currentUi.hover : ''}`}
     >
       <Icon size={18} />
     </button>
@@ -499,88 +539,89 @@ const Studio = ({ onHome, katexLoaded }) => {
   return (
     <div className={`flex flex-col h-screen ${currentUi.bg} font-sans ${currentUi.text} ${currentUi.selection} transition-colors duration-500`}>
       <style>{`@media print { nav, .sidebar, .toolbar, .print-hide { display: none !important; } .main-content { background: white; } }`}</style>
-      
+
       {/* Navbar */}
       <nav className={`h-14 ${currentUi.nav} ${currentUi.border} border-b flex items-center justify-between px-4 z-20 shadow-sm shrink-0`}>
         <div className="flex items-center gap-4">
-          <button onClick={onHome} className="flex items-center gap-3 hover:opacity-80"><div className={`p-1.5 rounded shadow ${currentUi.accent}`}><FileText size={20}/></div><span className="font-bold text-lg hidden sm:inline">Doxy</span></button>
+          <button onClick={onHome} className="flex items-center gap-3 hover:opacity-80"><div className={`p-1.5 rounded shadow ${currentUi.accent}`}><FileText size={20} /></div><span className="font-bold text-lg hidden sm:inline">Doxy</span></button>
           <span className={`${currentUi.secondary} hidden md:inline`}>/</span>
-          <input value={docTitle} onChange={e=>setDocTitle(e.target.value)} className={`bg-transparent font-medium outline-none w-48 truncate ${currentUi.text} opacity-90 focus:opacity-100 hidden md:block`} />
+          <input value={docTitle} onChange={e => setDocTitle(e.target.value)} className={`bg-transparent font-medium outline-none w-48 truncate ${currentUi.text} opacity-90 focus:opacity-100 hidden md:block`} />
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={()=>setUiTheme(t => t==='dark'?'sunset':'dark')} className={`p-2 rounded-full border ${currentUi.border} hover:bg-white/10`} title="Toggle Theme">{uiTheme==='dark'?<Sun size={16}/>:<Moon size={16}/>}</button>
-          {lastSaved && <span className={`text-xs ${currentUi.secondary} hidden md:flex gap-1 items-center`}><Check size={12}/> Saved</span>}
-          <button onClick={()=>setShowSettings(true)} className={`p-2 rounded-full border ${currentUi.border} ${!apiKey ? 'text-amber-500 border-amber-500/30' : currentUi.secondary}`}><Settings size={16}/></button>
+          <button onClick={() => setUiTheme(t => t === 'dark' ? 'sunset' : 'dark')} className={`p-2 rounded-full border ${currentUi.border} hover:bg-white/10`} title="Toggle Theme">{uiTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</button>
+          {lastSaved && <span className={`text-xs ${currentUi.secondary} hidden md:flex gap-1 items-center`}><Check size={12} /> Saved</span>}
+          <button onClick={() => setShowSettings(true)} className={`p-2 rounded-full border ${currentUi.border} ${!apiKey ? 'text-amber-500 border-amber-500/30' : currentUi.secondary}`}><Settings size={16} /></button>
         </div>
       </nav>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden main-content">
         {/* Input Sidebar */}
-        <div className={`sidebar w-full md:w-1/3 border-r ${currentUi.border} flex flex-col ${currentUi.sidebar} ${activeTab==='editor'?'block':'hidden md:flex'}`}>
+        <div className={`sidebar w-full md:w-1/3 border-r ${currentUi.border} flex flex-col ${currentUi.sidebar} ${activeTab === 'editor' ? 'block' : 'hidden md:flex'}`}>
           <div className={`p-3 border-b ${currentUi.border} grid grid-cols-2 gap-1`}>
-            <button onClick={()=>setMode('instant')} className={`flex items-center justify-center gap-2 py-2 rounded text-sm font-medium ${mode==='instant' ? currentUi.accent : currentUi.secondary}`}><Zap size={16}/> Instant</button>
-            <button onClick={()=>setMode('magic')} className={`flex items-center justify-center gap-2 py-2 rounded text-sm font-medium ${mode==='magic' ? 'bg-indigo-600 text-white' : currentUi.secondary}`}><Wand2 size={16}/> Magic</button>
+            <button onClick={() => setMode('instant')} className={`flex items-center justify-center gap-2 py-2 rounded text-sm font-medium ${mode === 'instant' ? currentUi.accent : currentUi.secondary}`}><Zap size={16} /> Instant</button>
+            <button onClick={() => setMode('magic')} className={`flex items-center justify-center gap-2 py-2 rounded text-sm font-medium ${mode === 'magic' ? 'bg-indigo-600 text-white' : currentUi.secondary}`}><Wand2 size={16} /> Magic</button>
           </div>
           <div className="flex-1 relative">
-            <textarea className={`absolute inset-0 w-full h-full p-6 resize-none focus:outline-none font-mono text-sm ${currentUi.text} bg-transparent leading-6`} placeholder="# Paste raw text here..." value={inputText} onChange={e=>setInputText(e.target.value)}/>
-            {inputText && <button onClick={()=>setInputText('')} className="absolute top-2 right-2 p-1.5 bg-white/10 text-slate-400 rounded hover:text-red-500 opacity-70 hover:opacity-100"><Eraser size={14}/></button>}
+            <textarea className={`absolute inset-0 w-full h-full p-6 resize-none focus:outline-none font-mono text-sm ${currentUi.text} bg-transparent leading-6`} placeholder="# Paste raw text here..." value={inputText} onChange={e => setInputText(e.target.value)} />
+            {inputText && <button onClick={() => setInputText('')} className="absolute top-2 right-2 p-1.5 bg-white/10 text-slate-400 rounded hover:text-red-500 opacity-70 hover:opacity-100"><Eraser size={14} /></button>}
           </div>
           <div className={`p-4 border-t ${currentUi.border}`}>
-             <button onClick={handleAIMagic} disabled={isProcessing||!inputText} className={`w-full py-3 rounded font-bold flex justify-center gap-2 ${isProcessing ? 'bg-white/5 text-slate-500' : 'bg-indigo-600 text-white'}`}>{isProcessing ? "Processing..." : <><Sparkles size={16}/> Apply Magic</>}</button>
+            <button onClick={handleAIMagic} disabled={isProcessing || !inputText} className={`w-full py-3 rounded font-bold flex justify-center gap-2 ${isProcessing ? 'bg-white/5 text-slate-500' : 'bg-indigo-600 text-white'}`}>{isProcessing ? "Processing..." : <><Sparkles size={16} /> Apply Magic</>}</button>
           </div>
         </div>
 
         {/* Editor Area */}
-        <div className={`flex-1 flex flex-col ${currentUi.editorBg} ${activeTab==='preview'?'block':'hidden md:flex'}`}>
+        <div className={`flex-1 flex flex-col ${currentUi.editorBg} ${activeTab === 'preview' ? 'block' : 'hidden md:flex'}`}>
           {/* Robust Toolbar */}
           <div className={`toolbar h-12 ${currentUi.toolbar} border-b ${currentUi.border} flex items-center px-4 justify-between shadow-sm z-10 overflow-x-auto no-scrollbar`}>
             <div className={`flex items-center gap-1 pr-4 border-r ${currentUi.border}`}>
-               <EditorBtn icon={Undo} title="Undo" onClick={()=>execCmd('undo')} />
-               <EditorBtn icon={Redo} title="Redo" onClick={()=>execCmd('redo')} />
-               <div className={`w-px h-4 bg-white/10 mx-2`}></div>
-               <EditorBtn icon={Bold} title="Bold" active={activeFormats.bold} onClick={()=>execCmd('bold')} />
-               <EditorBtn icon={Italic} title="Italic" active={activeFormats.italic} onClick={()=>execCmd('italic')} />
-               <EditorBtn icon={Underline} title="Underline" active={activeFormats.underline} onClick={()=>execCmd('underline')} />
-               <EditorBtn icon={RemoveFormatting} title="Clear Format" onClick={()=>execCmd('removeFormat')} />
-               <div className={`w-px h-4 bg-white/10 mx-2`}></div>
-               <EditorBtn icon={AlignLeft} title="Left" active={activeFormats.justifyLeft} onClick={()=>execCmd('justifyLeft')} />
-               <EditorBtn icon={AlignCenter} title="Center" active={activeFormats.justifyCenter} onClick={()=>execCmd('justifyCenter')} />
-               <EditorBtn icon={AlignRight} title="Right" active={activeFormats.justifyRight} onClick={()=>execCmd('justifyRight')} />
-               <div className={`w-px h-4 bg-white/10 mx-2`}></div>
-               <EditorBtn icon={Heading1} title="H1" onClick={()=>execCmd('formatBlock','H1')} />
-               <EditorBtn icon={Heading2} title="H2" onClick={()=>execCmd('formatBlock','H2')} />
-               <EditorBtn icon={Quote} title="Quote" onClick={()=>execCmd('formatBlock','BLOCKQUOTE')} />
-               <EditorBtn icon={LinkIcon} title="Link" onClick={handleLink} />
-               <div className={`w-px h-4 bg-white/10 mx-2`}></div>
-               <EditorBtn icon={GraduationCap} title="Cover Page" onClick={()=>setShowCoverModal(true)} />
-               <EditorBtn icon={BookOpen} title="Bibliography" onClick={generateBibliography} />
-               <EditorBtn icon={Trash2} title="Reset" onClick={handleReset} />
+              <EditorBtn icon={Undo} title="Undo" onClick={() => execCmd('undo')} />
+              <EditorBtn icon={Redo} title="Redo" onClick={() => execCmd('redo')} />
+              <div className={`w-px h-4 bg-white/10 mx-2`}></div>
+              <EditorBtn icon={Bold} title="Bold" active={activeFormats.bold} onClick={() => execCmd('bold')} />
+              <EditorBtn icon={Italic} title="Italic" active={activeFormats.italic} onClick={() => execCmd('italic')} />
+              <EditorBtn icon={Underline} title="Underline" active={activeFormats.underline} onClick={() => execCmd('underline')} />
+              <EditorBtn icon={RemoveFormatting} title="Clear Format" onClick={() => execCmd('removeFormat')} />
+              <div className={`w-px h-4 bg-white/10 mx-2`}></div>
+              <EditorBtn icon={AlignLeft} title="Left" active={activeFormats.justifyLeft} onClick={() => execCmd('justifyLeft')} />
+              <EditorBtn icon={AlignCenter} title="Center" active={activeFormats.justifyCenter} onClick={() => execCmd('justifyCenter')} />
+              <EditorBtn icon={AlignRight} title="Right" active={activeFormats.justifyRight} onClick={() => execCmd('justifyRight')} />
+              <div className={`w-px h-4 bg-white/10 mx-2`}></div>
+              <EditorBtn icon={Heading1} title="H1" onClick={() => execCmd('formatBlock', 'H1')} />
+              <EditorBtn icon={Heading2} title="H2" onClick={() => execCmd('formatBlock', 'H2')} />
+              <EditorBtn icon={Quote} title="Quote" onClick={() => execCmd('formatBlock', 'BLOCKQUOTE')} />
+              <EditorBtn icon={LinkIcon} title="Link" onClick={handleLink} />
+              <div className={`w-px h-4 bg-white/10 mx-2`}></div>
+              <EditorBtn icon={GraduationCap} title="Cover Page" onClick={() => setShowCoverModal(true)} />
+              <EditorBtn icon={ListOrdered} title="Table of Contents" onClick={generateTOC} />
+              <EditorBtn icon={BookOpen} title="Bibliography" onClick={generateBibliography} />
+              <EditorBtn icon={Trash2} title="Reset" onClick={handleReset} />
             </div>
             <div className="flex items-center gap-2 pl-4 shrink-0">
-               <select 
-                 value={theme} 
-                 onChange={(e) => setTheme(e.target.value)} 
-                 className={`px-2 py-1 rounded text-xs font-bold outline-none border ${currentUi.border} bg-white/5 ${currentUi.text} hover:bg-white/10 transition-colors cursor-pointer mr-2`}
-               >
-                 <option value="academic" className="bg-slate-900 text-white">Academic</option>
-                 <option value="modern" className="bg-slate-900 text-white">Modern</option>
-                 <option value="creative" className="bg-slate-900 text-white">Creative</option>
-               </select>
-               <button onClick={window.print} className={`px-2 py-1 text-xs font-medium ${currentUi.secondary} bg-white/5 rounded`}><Printer size={14}/></button>
-               <button onClick={handlePdfDownload} className="px-2 py-1 text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded transition-colors flex items-center gap-1"><FileDown size={14}/> .PDF</button>
+              <select
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+                className={`px-2 py-1 rounded text-xs font-bold outline-none border ${currentUi.border} bg-white/5 ${currentUi.text} hover:bg-white/10 transition-colors cursor-pointer mr-2`}
+              >
+                <option value="academic" className="bg-slate-900 text-white">Academic</option>
+                <option value="modern" className="bg-slate-900 text-white">Modern</option>
+                <option value="creative" className="bg-slate-900 text-white">Creative</option>
+              </select>
+              <button onClick={window.print} className={`px-2 py-1 text-xs font-medium ${currentUi.secondary} bg-white/5 rounded`}><Printer size={14} /></button>
+              <button onClick={handlePdfDownload} className="px-2 py-1 text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded transition-colors flex items-center gap-1"><FileDown size={14} /> .PDF</button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 md:p-12 cursor-text bg-black/20" onClick={()=>previewRef.current?.focus()}>
+          <div className="flex-1 overflow-y-auto p-6 md:p-12 cursor-text bg-black/20" onClick={() => previewRef.current?.focus()}>
             <div className={`document-page max-w-3xl mx-auto bg-white shadow-2xl rounded-sm min-h-[800px] p-12 outline-none ${themeStyles[theme].container}`}>
               {!inputText && <div className="text-slate-300 italic pointer-events-none absolute">Start typing or paste content...</div>}
-              <div ref={previewRef} contentEditable suppressContentEditableWarning className="outline-none min-h-[700px]" dangerouslySetInnerHTML={{__html: formattedHtml}} onInput={updateActiveFormats} />
+              <div ref={previewRef} contentEditable suppressContentEditableWarning className="outline-none min-h-[700px]" dangerouslySetInnerHTML={{ __html: formattedHtml }} onInput={updateActiveFormats} />
             </div>
             <div className={`stats-footer sticky bottom-4 mx-auto w-fit ${currentUi.nav} ${currentUi.text} border ${currentUi.border} px-4 py-1.5 rounded-full text-xs shadow-lg flex gap-4 opacity-90`}>
-              <span className="flex items-center gap-1"><LayoutTemplate size={12}/> {stats.words} words</span>
+              <span className="flex items-center gap-1"><LayoutTemplate size={12} /> {stats.words} words</span>
               <span className="opacity-50">|</span>
-              <span className="flex items-center gap-1"><Calculator size={12}/> ~{stats.time} min read</span>
+              <span className="flex items-center gap-1"><Calculator size={12} /> ~{stats.time} min read</span>
             </div>
           </div>
         </div>
@@ -590,17 +631,17 @@ const Studio = ({ onHome, katexLoaded }) => {
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className={`${currentUi.nav} border ${currentUi.border} rounded-xl p-6 w-full max-w-sm`}>
-            <div className="flex justify-between mb-4"><h3 className="font-bold">Settings</h3><button onClick={()=>setShowSettings(false)}><X/></button></div>
-            <input type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} className="w-full p-2 bg-black/20 border border-white/10 rounded mb-4" placeholder="Gemini API Key" />
-            <button onClick={()=>setShowSettings(false)} className={`w-full py-2 rounded ${currentUi.accent}`}>Save</button>
+            <div className="flex justify-between mb-4"><h3 className="font-bold">Settings</h3><button onClick={() => setShowSettings(false)}><X /></button></div>
+            <input type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} className="w-full p-2 bg-black/20 border border-white/10 rounded mb-4" placeholder="Gemini API Key" />
+            <button onClick={() => setShowSettings(false)} className={`w-full py-2 rounded ${currentUi.accent}`}>Save</button>
           </div>
         </div>
       )}
-      
+
       {/* Notification Toast */}
       {notification && (
-        <div className={`fixed bottom-6 right-6 px-4 py-3 rounded shadow-xl flex items-center gap-2 z-50 ${notification.type==='error'?'bg-red-600 text-white':'bg-green-600 text-white'}`}>
-          {notification.type==='error'?<AlertCircle size={16}/>:<Check size={16}/>} {notification.msg}
+        <div className={`fixed bottom-6 right-6 px-4 py-3 rounded shadow-xl flex items-center gap-2 z-50 ${notification.type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}>
+          {notification.type === 'error' ? <AlertCircle size={16} /> : <Check size={16} />} {notification.msg}
         </div>
       )}
     </div>
@@ -614,11 +655,11 @@ const Doxy = () => {
 
   useEffect(() => {
     const link = document.createElement('link'); link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"; link.rel = "stylesheet"; document.head.appendChild(link);
-    const script = document.createElement('script'); script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"; 
+    const script = document.createElement('script'); script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js";
     script.onload = () => setKatexLoaded(true); document.head.appendChild(script);
   }, []);
 
-  return view === 'landing' ? <LandingPage onLaunch={()=>setView('app')} katexLoaded={katexLoaded}/> : <Studio onHome={()=>setView('landing')} katexLoaded={katexLoaded}/>;
+  return view === 'landing' ? <LandingPage onLaunch={() => setView('app')} katexLoaded={katexLoaded} /> : <Studio onHome={() => setView('landing')} katexLoaded={katexLoaded} />;
 };
 
 export default Doxy;
