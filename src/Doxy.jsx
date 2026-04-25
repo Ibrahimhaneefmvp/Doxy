@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import html2pdf from 'html2pdf.js';
 import { 
   FileText, Copy, Settings, Eraser, Check, Type, Sparkles, AlertCircle, X,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List,
@@ -443,21 +444,29 @@ const Studio = ({ onHome, katexLoaded }) => {
     }
   };
 
-  const handleDownload = (fmt) => {
+  const handlePdfDownload = () => {
     if (!previewRef.current) return;
-    const content = previewRef.current.innerHTML;
-    let mime = 'text/plain', ext = 'txt', body = previewRef.current.innerText;
-    if (fmt === 'html') {
-      mime = 'text/html'; ext = 'html';
-      body = `<!DOCTYPE html><html><head><title>${docTitle}</title><meta charset="utf-8"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"></head><body style="max-width:800px;margin:0 auto;font-family:serif;line-height:1.6">${content}</body></html>`;
-    } else if (fmt === 'doc') {
-      mime = 'application/msword'; ext = 'doc';
-      body = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset="utf-8"><title>${docTitle}</title></head><body>${content}</body></html>`;
-    }
-    const blob = new Blob([body], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${docTitle.replace(/\s+/g, '_')}.${ext}`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setIsProcessing(true);
+    // Add a temporary print class to prevent UI elements from being captured if any,
+    // though html2pdf mainly captures what's inside the ref.
+    const element = previewRef.current.parentElement; // The document-page div
+    
+    const opt = {
+      margin:       0.5,
+      filename:     `${docTitle.replace(/\s+/g, '_')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(opt).from(element).save().then(() => {
+      setIsProcessing(false);
+      setNotification({msg:"PDF Downloaded Successfully!", type:'success'});
+    }).catch(e => {
+      setIsProcessing(false);
+      setNotification({msg:"Failed to generate PDF.", type:'error'});
+      console.error(e);
+    });
   };
 
   const handleAIMagic = async () => {
@@ -549,8 +558,17 @@ const Studio = ({ onHome, katexLoaded }) => {
                <EditorBtn icon={Trash2} title="Reset" onClick={handleReset} />
             </div>
             <div className="flex items-center gap-2 pl-4 shrink-0">
+               <select 
+                 value={theme} 
+                 onChange={(e) => setTheme(e.target.value)} 
+                 className={`px-2 py-1 rounded text-xs font-bold outline-none border ${currentUi.border} bg-white/5 ${currentUi.text} hover:bg-white/10 transition-colors cursor-pointer mr-2`}
+               >
+                 <option value="academic" className="bg-slate-900 text-white">Academic</option>
+                 <option value="modern" className="bg-slate-900 text-white">Modern</option>
+                 <option value="creative" className="bg-slate-900 text-white">Creative</option>
+               </select>
                <button onClick={window.print} className={`px-2 py-1 text-xs font-medium ${currentUi.secondary} bg-white/5 rounded`}><Printer size={14}/></button>
-               <button onClick={()=>handleDownload('doc')} className="px-2 py-1 text-xs font-medium text-indigo-300 bg-indigo-500/10 rounded"><FileDown size={14}/> .Doc</button>
+               <button onClick={handlePdfDownload} className="px-2 py-1 text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded transition-colors flex items-center gap-1"><FileDown size={14}/> .PDF</button>
             </div>
           </div>
 
